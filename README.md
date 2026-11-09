@@ -179,3 +179,16 @@ User Input (Voice Log / Text Chat)
   |  Support Engine                      |
   |  Gentle Nudges / Resources / Alerts  |
   +--------------------------------------+
+
+## Backend configuration
+
+The backend reads its configuration from environment variables. For local development, copy `backend/.env.example` to `backend/.env` and fill in the values; `backend/.env` is intentionally ignored by Git.
+
+Required operational steps after the previous public exposure:
+
+1. Revoke and regenerate the exposed Gemini API key.
+2. Rotate the MongoDB database user password and update the connection string. Review MongoDB audit logs and restrict the user to the minimum required database privileges.
+3. Generate a new random `SECRET_KEY` of at least 32 characters. Existing sessions signed with the old key must be treated as invalid.
+4. Rotate the Google OAuth client secret if it was active outside this repository.
+
+The backend now rejects missing or weak JWT secrets, verifies Google ID tokens against the configured OAuth client, and never accepts test or fabricated authentication tokens.

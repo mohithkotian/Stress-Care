@@ -1,16 +1,17 @@
-from pymongo import MongoClient
 import os
-import dns.resolver
+from pathlib import Path
+
 from dotenv import load_dotenv
+from pymongo import MongoClient
 
-load_dotenv()
-
-# dns.resolver.default_resolver = dns.resolver.Resolver(configure=False)
-# dns.resolver.default_resolver.nameservers = ['8.8.8.8', '8.8.4.4']
+# Load the backend-local environment file when running from any working directory.
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 MONGO_URI = os.getenv("MONGO_URI")
+if not MONGO_URI:
+    raise RuntimeError("MONGO_URI is required; configure it in backend/.env or the process environment")
 
-client = MongoClient(MONGO_URI)
+DB_NAME = os.getenv("DB_NAME", "stress_care")
 
-# ✅ use same DB name everywhere
-db = client["stress_care"]
+client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+db = client[DB_NAME]
